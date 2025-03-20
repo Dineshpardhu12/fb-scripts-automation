@@ -35,3 +35,4 @@ RUN chmod +x /app/entrypoint.sh
 
 # Run the entrypoint script when the container launches
 CMD ["/app/entrypoint.sh"]
+CMD ["cron", "-f"]
