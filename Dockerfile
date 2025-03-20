@@ -3,14 +3,14 @@ FROM python:3.9-slim
 # Set working directory
 WORKDIR /app
 
-# Install cron and required packages
-RUN apt-get update && apt-get -y install cron && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* \
-    apt-get install vim
+# Install cron, vim, and required packages
+RUN apt-get update && apt-get -y install cron vim && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* 
 
 # Install compatible versions of numpy and pandas
 RUN pip install --no-cache-dir numpy==1.24.3
 RUN pip install --no-cache-dir pandas==2.0.3 requests==2.31.0 beautifulsoup4==4.12.2 openpyxl==3.1.2
+
 # Install additional dependencies for handling various Excel formats
 RUN pip install --no-cache-dir odfpy xlrd xlwt
 
@@ -33,6 +33,8 @@ RUN touch /app/fb_poster.log && chmod 666 /app/fb_poster.log
 RUN echo '#!/bin/sh\nservice cron start\ntail -f /app/fb_poster.log' > /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-# Run the entrypoint script when the container launches
-CMD ["/app/entrypoint.sh"]
+# Set entrypoint for setup
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Start cron in the foreground
 CMD ["cron", "-f"]
