@@ -135,7 +135,7 @@ def get_product_details(affiliate_link, max_retries=3):
                         break
                     
             # If still no product name, try to find in JSON-LD
-            if not product_name or product_name == "Unknown Product":
+            if not product_name or product_name == "Surprice Product with maximum discount":
                 json_ld_scripts = soup.find_all("script", {"type": "application/ld+json"})
                 for script in json_ld_scripts:
                     try:
