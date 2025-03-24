@@ -7,6 +7,7 @@ import random
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 import re
+import pytz  # Added for timezone handling
 
 def get_product_details(affiliate_link, max_retries=3):
     """
@@ -106,9 +107,9 @@ def get_product_details(affiliate_link, max_retries=3):
                 time.sleep(random.uniform(2, 5))
                 continue
                 
-            # Save HTML for debugging (uncomment if needed)
-            # with open(f"amazon_response_{retry_count}.html", "w", encoding="utf-8") as f:
-            #     f.write(response.text)
+            # Debug: Save HTML for troubleshooting image extraction issues
+            with open(f"amazon_response_debug.html", "w", encoding="utf-8") as f:
+                f.write(response.text)
                 
             soup = BeautifulSoup(response.text, "html.parser")
             
@@ -135,7 +136,7 @@ def get_product_details(affiliate_link, max_retries=3):
                         break
                     
             # If still no product name, try to find in JSON-LD
-            if not product_name or product_name == "Unknown Product":
+            if not product_name or product_name == "Surprice Product with maximum discount":
                 json_ld_scripts = soup.find_all("script", {"type": "application/ld+json"})
                 for script in json_ld_scripts:
                     try:
@@ -162,7 +163,8 @@ def get_product_details(affiliate_link, max_retries=3):
                 soup.select_one("#corePrice_feature_div .a-price-whole"),
                 soup.select_one(".a-price"),
                 soup.select_one("#price"),
-                soup.select_one(".price")
+                soup.select_one(".price"),
+                soup.select_one("#corePrice_desktop .a-offscreen")  # Added additional selector
             ]
             
             for selector in price_selectors:
@@ -408,6 +410,18 @@ def get_product_details(affiliate_link, max_retries=3):
             if image_url:
                 print(f"Image appears to be high-resolution: {is_high_res(image_url)}")
 
+            # Verify image URL by making a request to check if it's valid
+            if image_url:
+                try:
+                    print(f"Verifying image URL: {image_url}")
+                    img_response = requests.head(image_url, timeout=10)
+                    if img_response.status_code != 200:
+                        print(f"WARNING: Image URL returned status code {img_response.status_code}")
+                    else:
+                        print(f"Image URL verified successfully!")
+                except Exception as e:
+                    print(f"WARNING: Error verifying image URL: {e}")
+
             # If we have a good product name and either price or image, consider it successful
             if product_name != "Unknown Product" and (price != "N/A" or image_url):
                 return product_name, price, image_url
@@ -551,9 +565,19 @@ def main():
     print(f"Script started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     PAGE_ID = '415136901932889'  # Your Facebook Page ID
-    ACCESS_TOKEN = ''  # Your access token
-    EXCEL_FILE_PATH = '/app/fb.xlsx'  # Path to your Excel file
+    ACCESS_TOKEN = 'EAAJJznBs8AEBO4jGIekS4AzeTMtoZBnZBj3LkgPZCwqZCvFpTf8ejAb5RiolTa7TZC7FngHM1b3FScsjSn5R7GspFutlsR89iz02d1uszyZAtzm5Onirfk3Y17g6VXNH6lC2omcEZBZAJe2VKzrAwxVtiBeT2uLdH0LDF9QObq9yhkOyZAGEcZB9emlSznZB6AOiZBKZA'  # Your access token
+    EXCEL_FILE_PATH = 'fb.xlsx'  # Path to your Excel file
     MAX_RETRIES = 3  # Maximum number of retries for product extraction
+    
+    # Timezone for local time (replace 'Asia/Kolkata' with your timezone)
+    # Common values: 'America/New_York', 'Europe/London', 'Asia/Kolkata', etc.
+    LOCAL_TIMEZONE = 'Asia/Kolkata'  # Change this to your local timezone
+    
+    try:
+        local_tz = pytz.timezone(LOCAL_TIMEZONE)
+    except pytz.exceptions.UnknownTimeZoneError:
+        print(f"Unknown timezone: {LOCAL_TIMEZONE}. Falling back to system local time.")
+        local_tz = None
 
     # Check if Excel file exists
     if not os.path.exists(EXCEL_FILE_PATH):
@@ -574,7 +598,16 @@ def main():
 
         if product_details:
             product_name, price, image_url = product_details
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Use local time instead of UTC
+            if local_tz:
+                # Convert UTC time to local time
+                current_time = datetime.now(timezone.utc).astimezone(local_tz).strftime("%Y-%m-%d %H:%M:%S")
+                print(f"Using local time ({LOCAL_TIMEZONE}): {current_time}")
+            else:
+                # Use system local time if timezone is unknown
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print(f"Using system local time: {current_time}")
 
             # Prepare message for Facebook post
             message = (
@@ -601,6 +634,17 @@ def main():
                     print(f"Error posting with image: {response}")
                     if 'error' in response:
                         print(f"Facebook Error: {response['error'].get('message', 'Unknown error')}")
+                        # If error is due to invalid image URL, try alternative format
+                        if 'image' in str(response['error'].get('message', '')).lower():
+                            print("Attempting alternative image URL format...")
+                            # Try alternative image URL format (removing query parameters)
+                            if '?' in image_url:
+                                clean_image_url = image_url.split('?')[0]
+                                print(f"Trying with clean image URL: {clean_image_url}")
+                                response = post_to_facebook(PAGE_ID, ACCESS_TOKEN, message, clean_image_url)
+                                if 'id' in response:
+                                    print(f"Successfully posted with clean image URL. Post ID: {response['id']}")
+                                    success = True
             else:
                 print("No image URL available, will try text-only post")
             

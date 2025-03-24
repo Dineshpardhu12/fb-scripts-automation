@@ -19,7 +19,7 @@ COPY fb.py /app/fb.py
 COPY fb.xlsx /app/fb.xlsx
 
 # Create a cron job file with absolute path to Python
-RUN echo "0 * * * * /usr/local/bin/python /app/fb.py >> /app/fb_poster.log 2>&1" > /etc/cron.d/fb-poster-cron
+RUN echo "*/30 * * * * /usr/local/bin/python /app/fb.py >> /app/fb_poster.log 2>&1" > /etc/cron.d/fb-poster-cron
 RUN chmod 0644 /etc/cron.d/fb-poster-cron
 RUN chmod 0644 /app/fb.xlsx
 
