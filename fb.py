@@ -566,7 +566,7 @@ def main():
     
     PAGE_ID = '415136901932889'  # Your Facebook Page ID
     ACCESS_TOKEN = 'EAAJJznBs8AEBO4jGIekS4AzeTMtoZBnZBj3LkgPZCwqZCvFpTf8ejAb5RiolTa7TZC7FngHM1b3FScsjSn5R7GspFutlsR89iz02d1uszyZAtzm5Onirfk3Y17g6VXNH6lC2omcEZBZAJe2VKzrAwxVtiBeT2uLdH0LDF9QObq9yhkOyZAGEcZB9emlSznZB6AOiZBKZA'  # Your access token
-    EXCEL_FILE_PATH = 'fb.xlsx'  # Path to your Excel file
+    EXCEL_FILE_PATH = '/app/fb.xlsx'  # Path to your Excel file
     MAX_RETRIES = 3  # Maximum number of retries for product extraction
     
     # Timezone for local time (replace 'Asia/Kolkata' with your timezone)
