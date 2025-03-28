@@ -59,7 +59,7 @@ def get_product_details(affiliate_link, max_retries=3):
             # Handle redirects manually to better track the path
             final_url = affiliate_link
             redirect_count = 0
-            max_redirects = 7
+            max_redirects = 9
             
             while (initial_response.status_code in [301, 302, 303, 307, 308]) and redirect_count < max_redirects:
                 redirect_url = initial_response.headers.get('Location')
