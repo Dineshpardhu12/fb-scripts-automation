@@ -17,15 +17,19 @@ RUN pip install --no-cache-dir odfpy xlrd xlwt
 # Copy script and other files
 COPY fb.py /app/fb.py
 COPY fb.xlsx /app/fb.xlsx
+COPY job.py /app/job.py
 COPY amazon.py /app/amazon.py
 
 # Create a cron job file with absolute path to Python
 RUN echo "*/15 * * * * /usr/local/bin/python /app/fb.py >> /app/fb_poster.log 2>&1" > /etc/cron.d/fb-poster-cron && \
-    echo "*/10 * * * * /usr/local/bin/python /app/amazon.py >> /app/amazon.log 2>&1" >> /etc/cron.d/fb-poster-cron
+    echo "*/10 * * * * /usr/local/bin/python /app/amazon.py >> /app/amazon.log 2>&1" >> /etc/cron.d/fb-poster-cron && \
+    echo "10 * * * * /usr/local/bin/python /app/job.py >> /app/job.log 2>&1" >> /etc/cron.d/fb-poster-cron
+
 
 RUN chmod 0644 /etc/cron.d/fb-poster-cron
 RUN chmod 0644 /app/fb.xlsx
-
+RUN chmod 0644 /app/job.py
+RUN chmod 0644 /app/job.xlsx
 # Apply cron job to crontab
 RUN crontab /etc/cron.d/fb-poster-cron
 
