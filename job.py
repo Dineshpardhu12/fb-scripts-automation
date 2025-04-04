@@ -115,7 +115,7 @@ def main():
     # Configuration
     PAGE_ID = '447788546001338'  # Your Facebook Page ID
     ACCESS_TOKEN = 'EAAQjopZAjD24BO0QObyvTXwXQjgvfslINjZBE5DbBcx8tx1bDbWRZA0wmSSNXcOhJP3fWve1lYaaYLW2er1ZBqw1BHlKpZAukMj7FLrLsnsNS9DDaNsEhA9YZBQ1f0EwOlLXdgTZAbCusZBqF0EYiHXhBOf9IZCZAPqyN890YW3NZCftPCYJ18B8SBFS1W84b8U2ZB91'  # Your access token
-    EXCEL_FILE_PATH = 'job.xlsx'  # Path to your Excel file
+    EXCEL_FILE_PATH = '/app/job.xlsx'  # Path to your Excel file
     LOCAL_TIMEZONE = 'Asia/Kolkata'  # Change this to your local timezone
     
     try:
