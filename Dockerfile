@@ -19,6 +19,7 @@ COPY fb.py /app/fb.py
 COPY fb.xlsx /app/fb.xlsx
 COPY job.py /app/job.py
 COPY amazon.py /app/amazon.py
+COPY job.xlsx /app/job.xlsx
 
 # Create a cron job file with absolute path to Python
 RUN echo "*/15 * * * * /usr/local/bin/python /app/fb.py >> /app/fb_poster.log 2>&1" > /etc/cron.d/fb-poster-cron && \
@@ -45,3 +46,4 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Start cron in the foreground
 CMD ["cron", "-f"]
+
