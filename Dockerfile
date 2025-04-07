@@ -22,8 +22,8 @@ COPY amazon.py /app/amazon.py
 COPY job.xlsx /app/job.xlsx
 
 # Create a cron job file with absolute path to Python
-RUN echo "*/15 * * * * /usr/local/bin/python /app/fb.py >> /app/fb_poster.log 2>&1" > /etc/cron.d/fb-poster-cron && \
-    echo "*/10 * * * * /usr/local/bin/python /app/amazon.py >> /app/amazon.log 2>&1" >> /etc/cron.d/fb-poster-cron && \
+RUN echo "*/15 * * * * /usr/local/bin/python /app/market_place.py >> /app/fb_poster.log 2>&1" > /etc/cron.d/fb-poster-cron && \
+    echo "*/10 * * * * /usr/local/bin/python /app/we_love_amazon.py >> /app/amazon.log 2>&1" >> /etc/cron.d/fb-poster-cron && \
     echo "10 * * * * /usr/local/bin/python /app/job.py >> /app/job.log 2>&1" >> /etc/cron.d/fb-poster-cron
 
 
