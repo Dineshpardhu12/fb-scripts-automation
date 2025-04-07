@@ -417,13 +417,16 @@ def get_product_details(affiliate_link, max_retries=3):
                     img_response = requests.head(image_url, timeout=10)
                     if img_response.status_code != 200:
                         print(f"WARNING: Image URL returned status code {img_response.status_code}")
+                        image_url = None  # Reset image URL if not valid
                     else:
                         print(f"Image URL verified successfully!")
                 except Exception as e:
                     print(f"WARNING: Error verifying image URL: {e}")
+                    image_url = None  # Reset image URL on error
 
-            # If we have a good product name and either price or image, consider it successful
-            if product_name != "Unknown Product" and (price != "N/A" or image_url):
+            # Modified condition: Both price must be available and not be "N/A"
+            # AND image_url must be valid
+            if product_name != "Unknown Product" and price != "N/A" and image_url:
                 return product_name, price, image_url
             
             print("Missing product details, will retry...")
@@ -438,10 +441,8 @@ def get_product_details(affiliate_link, max_retries=3):
             retry_count += 1
             time.sleep(random.uniform(3, 7))
     
-    # If we've exhausted all retries, return what we have even if incomplete
-    return product_name if 'product_name' in locals() else "Unknown Product", \
-           price if 'price' in locals() else "N/A", \
-           image_url if 'image_url' in locals() and image_url else None
+    # Return None if we couldn't get all required information
+    return None
 
 def post_to_facebook(page_id, access_token, message, image_url):
     """
@@ -532,35 +533,6 @@ def get_next_affiliate_link(file_path, index_file='.current_link_index'):
         print(f"Error reading Excel file: {e}")
         return None
 
-def post_text_only_to_facebook(page_id, access_token, message):
-    """
-    Post a text-only message to a Facebook page if image is unavailable.
-
-    Args:
-        page_id (str): The ID of the Facebook page.
-        access_token (str): The Facebook Graph API access token.
-        message (str): The message to post.
-
-    Returns:
-        dict: The response from the Facebook Graph API.
-    """
-    url = f"https://graph.facebook.com/v18.0/{page_id}/feed"
-    
-    payload = {
-        'message': message,
-        'access_token': access_token
-    }
-    
-    try:
-        print("Posting text-only message to Facebook as fallback")
-        response = requests.post(url, data=payload)
-        result = response.json()
-        print(f"Facebook API response: {result}")
-        return result
-    except Exception as e:
-        print(f"Error posting text to Facebook: {e}")
-        return {"error": str(e)}
-
 def main():
     print(f"Script started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
@@ -619,17 +591,13 @@ def main():
 
             print(f"Prepared post message:\n{message}")
             
-            # Post to Facebook
-            success = False
-            
-            # Try posting with image first if available
-            if image_url:
+            # Post to Facebook only if we have valid image and price
+            if image_url and price != "N/A":
                 time.sleep(random.uniform(1, 2))  # Small delay before API call
                 response = post_to_facebook(PAGE_ID, ACCESS_TOKEN, message, image_url)
 
                 if 'id' in response:
                     print(f"Successfully posted with image. Post ID: {response['id']}")
-                    success = True
                 else:
                     print(f"Error posting with image: {response}")
                     if 'error' in response:
@@ -644,23 +612,20 @@ def main():
                                 response = post_to_facebook(PAGE_ID, ACCESS_TOKEN, message, clean_image_url)
                                 if 'id' in response:
                                     print(f"Successfully posted with clean image URL. Post ID: {response['id']}")
-                                    success = True
+                                else:
+                                    print("Failed to post even with clean image URL, skipping this post")
+                            else:
+                                print("Cannot clean image URL, skipping this post")
+                        else:
+                            print("Error not related to image, skipping this post")
             else:
-                print("No image URL available, will try text-only post")
-            
-            # If posting with image failed or no image is available, try text-only post
-            if not success:
-                time.sleep(random.uniform(1, 2))  # Small delay before retry
-                response = post_text_only_to_facebook(PAGE_ID, ACCESS_TOKEN, message)
-                
-                if 'id' in response:
-                    print(f"Successfully posted text-only message. Post ID: {response['id']}")
-                else:
-                    print(f"Error posting text-only message: {response}")
-                    if 'error' in response:
-                        print(f"Facebook Error: {response['error'].get('message', 'Unknown error')}")
+                # Skip posting if either image or price is missing
+                if not image_url:
+                    print("Skipping post: No valid image URL available")
+                if price == "N/A":
+                    print("Skipping post: No valid price available")
         else:
-            print("Failed to extract product details after all attempts.")
+            print("Failed to extract complete product details after all attempts. Skipping post.")
     else:
         print("No valid affiliate link found in Excel.")
     
