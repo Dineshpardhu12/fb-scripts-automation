@@ -15,10 +15,10 @@ RUN pip install --no-cache-dir pandas==2.0.3 requests==2.31.0 beautifulsoup4==4.
 RUN pip install --no-cache-dir odfpy xlrd xlwt
 
 # Copy script and other files
-COPY fb.py /app/fb.py
+COPY market_place.py /app/fb.py
 COPY fb.xlsx /app/fb.xlsx
 COPY job.py /app/job.py
-COPY amazon.py /app/amazon.py
+COPY we_love_amazon.py /app/amazon.py
 COPY job.xlsx /app/job.xlsx
 
 # Create a cron job file with absolute path to Python
