@@ -1,12 +1,13 @@
 // Jenkinsfile (Scripted Pipeline)
 
-def DOCKERHUB_USERNAME = 'dineshpardhu1'        // 🔁 change this
+def DOCKERHUB_USERNAME = 'dineshpardhu1'
 def IMAGE_NAME = 'affiliate-poster'
-def DEPLOY_ENV = 'dev'                                    // can be parameterized
+def DEPLOY_ENV = 'dev'
 def GIT_BRANCH = "${env.BRANCH_NAME ?: 'main'}"
 def BUILD_TAG = "${DEPLOY_ENV}-${env.BUILD_NUMBER}"
 def DOCKER_IMAGE_TAG = "${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_TAG}"
 def KUBE_DEPLOY_FILE = "k8s/deployment-${DEPLOY_ENV}.yaml"
+def DOCKER_PATH = "/usr/local/bin"  // ✅ Your docker path
 
 node {
     try {
@@ -22,13 +23,17 @@ node {
 
         stage('Build Docker Image') {
             echo "Building Docker image: ${DOCKER_IMAGE_TAG}"
-            sh "docker build -t ${DOCKER_IMAGE_TAG} ."
+            sh """
+                export PATH="${DOCKER_PATH}:\$PATH"
+                docker build -t ${DOCKER_IMAGE_TAG} .
+            """
         }
 
         stage('Push to Docker Hub') {
             echo "Pushing Docker image to Docker Hub..."
             withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                 sh """
+                    export PATH="${DOCKER_PATH}:\$PATH"
                     echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                     docker push ${DOCKER_IMAGE_TAG}
                     docker logout
@@ -38,9 +43,8 @@ node {
 
         stage('Deploy to Kubernetes') {
             echo "Deploying to Kubernetes using ${KUBE_DEPLOY_FILE}..."
-
-            // Replace the image in the deployment YAML and apply it
             sh """
+                export PATH="${DOCKER_PATH}:\$PATH"
                 sed 's|IMAGE_PLACEHOLDER|${DOCKER_IMAGE_TAG}|' ${KUBE_DEPLOY_FILE} > deploy.yaml
                 kubectl apply -f deploy.yaml
             """
@@ -56,5 +60,3 @@ node {
         throw e
     }
 }
-
-
