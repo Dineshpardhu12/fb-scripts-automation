@@ -31,13 +31,13 @@ node {
 
         stage('Push to Docker Hub') {
             echo "Pushing Docker image to Docker Hub..."
-            withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                sh """
-                    export PATH="${DOCKER_PATH}:\$PATH"
-                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                    docker push ${DOCKER_IMAGE_TAG}
-                    docker logout
-                """
+            withCredentials([usernamePassword(credentialsId: '11728cc9-b713-4bf8-925b-b1e1c03a12f8', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            sh """
+                export PATH="${DOCKER_PATH}:\$PATH"
+                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                docker push ${DOCKER_IMAGE_TAG}
+                docker logout
+            """
             }
         }
 
