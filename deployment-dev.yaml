@@ -1,0 +1,21 @@
+# k8s/deployment-dev.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: affiliate-poster-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: affiliate-poster
+  template:
+    metadata:
+      labels:
+        app: affiliate-poster
+      spec:
+      containers:
+      - name: affiliate-poster
+        image: dineshpardhu1/amazon
+        ports:
+        - containerPort: 3000  # ✅ Correct indentation and YAML syntax
+
