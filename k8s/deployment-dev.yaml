@@ -13,9 +13,9 @@ spec:
       labels:
         app: affiliate-poster
       spec:
-      containers:
-      - name: affiliate-poster
-        image: dineshpardhu1/amazon
-        ports:
-        - containerPort: 3000  # ✅ Correct indentation and YAML syntax
+        containers:
+        - name: affiliate-poster
+          image: dineshpardhu1/amazon
+          ports:
+          - containerPort: 3000  # ✅ Correct indentation and YAML syntax
 
