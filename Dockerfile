@@ -47,3 +47,5 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Start cron in the foreground
 CMD ["cron", "-f"]
+
+
