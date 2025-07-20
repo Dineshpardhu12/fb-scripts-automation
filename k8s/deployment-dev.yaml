@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: affiliate-poster-deployment
+  labels:
+    app: affiliate-poster
 spec:
   replicas: 1
   selector:
@@ -13,7 +15,22 @@ spec:
         app: affiliate-poster
     spec:
       containers:
-      - name: affiliate-poster
-      image: dineshpardhu1/amazon
-      ports:
-      - containerPort: 3000
+        - name: affiliate-poster
+          image: dineshpardhu1/affiliate-poster:dev-23 # Change to your Docker image
+          ports:
+            - containerPort: 5000 # Adjust if your app runs on a different port
+          env:
+            - name: FACEBOOK_PAGE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: fb-secrets
+                  key: page_token
+            - name: SCHEDULE
+              value: "0 * * * *" # Example cron for hourly execution
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
