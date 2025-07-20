@@ -31,7 +31,7 @@ node {
 
         stage('Push to Docker Hub') {
             echo "Pushing Docker image to Docker Hub..."
-            withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'dineshpardhu1', passwordVariable: 'Dinvan@210')]) {
                 sh """
                     export PATH="${DOCKER_PATH}:\$PATH"
                     echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
