@@ -45,8 +45,8 @@ node {
             echo "Deploying to Kubernetes using ${KUBE_DEPLOY_FILE}..."
             sh """
                 export PATH="${DOCKER_PATH}:\$PATH"
-                sed 's|IMAGE_PLACEHOLDER|${DOCKER_IMAGE_TAG}|' ${KUBE_DEPLOY_FILE} > deploy.yaml
-                kubectl apply -f deploy.yaml
+                sed 's|IMAGE_PLACEHOLDER|${DOCKER_IMAGE_TAG}|' ${KUBE_DEPLOY_FILE} > deployment-dev.yaml
+                kubectl apply -f deployment-dev.yaml
             """
         }
 
