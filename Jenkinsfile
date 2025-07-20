@@ -1,6 +1,6 @@
 // Jenkinsfile (Scripted Pipeline)
 
-def DOCKERHUB_USERNAME = 'your-dockerhub-username'        // 🔁 change this
+def DOCKERHUB_USERNAME = 'dineshpardhu1'        // 🔁 change this
 def IMAGE_NAME = 'affiliate-poster'
 def DEPLOY_ENV = 'dev'                                    // can be parameterized
 def GIT_BRANCH = "${env.BRANCH_NAME ?: 'main'}"
