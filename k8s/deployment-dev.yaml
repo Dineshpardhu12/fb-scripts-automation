@@ -20,11 +20,11 @@ spec:
           ports:
             - containerPort: 5000 # Adjust if your app runs on a different port
           env:
-            - name: FACEBOOK_PAGE_TOKEN
+            - name: '415136901932889'
               valueFrom:
                 secretKeyRef:
                   name: fb-secrets
-                  key: page_token
+                  key: 'EAAJJznBs8AEBO4jGIekS4AzeTMtoZBnZBj3LkgPZCwqZCvFpTf8ejAb5RiolTa7TZC7FngHM1b3FScsjSn5R7GspFutlsR89iz02d1uszyZAtzm5Onirfk3Y17g6VXNH6lC2omcEZBZAJe2VKzrAwxVtiBeT2uLdH0LDF9QObq9yhkOyZAGEcZB9emlSznZB6AOiZBKZA'
             - name: SCHEDULE
               value: "0 * * * *" # Example cron for hourly execution
           resources:
