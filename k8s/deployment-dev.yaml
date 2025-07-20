@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: affiliate-poster
-          image: dineshpardhu1/affiliate-poster:dev-25 # Change to your Docker image
+          image: dineshpardhu1/affiliate-poster:dev-26 # Change to your Docker image
           ports:
             - containerPort: 5000 # Adjust if your app runs on a different port
           env:
